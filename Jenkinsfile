@@ -24,22 +24,26 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
-                    if (env.BRANCH_NAME == 'main') {
+                    def currentBranch = env.BRANCH_NAME ?: 'main'
+
+                    if (currentBranch == 'main') {
                         env.BRANCH_TYPE = 'production'
-                    } else if (env.BRANCH_NAME == 'ec2-staging') {
+                    } else if (currentBranch == 'ec2-staging') {
                         env.BRANCH_TYPE = 'staging'
-                    } else if (env.BRANCH_NAME == 'ec2-development') {
+                    } else if (currentBranch == 'ec2-development') {
                         env.BRANCH_TYPE = 'development'
-                    } else if (env.BRANCH_NAME.startsWith('feature/')) {
+                    } else if (currentBranch.startsWith('feature/')) {
                         env.BRANCH_TYPE = 'feature'
                     } else {
                         env.BRANCH_TYPE = 'other'
                     }
+
+                    env.CURRENT_BRANCH = currentBranch
                 }
 
                 sh '''
                     echo "=== Pipeline Information ==="
-                    echo "Branch: $BRANCH_NAME"
+                    echo "Branch: $CURRENT_BRANCH"
                     echo "Branch Type: $BRANCH_TYPE"
                     echo "Deploy Target: $DEPLOY_TARGET"
                     echo "Run Health Check: $RUN_HEALTH_CHECK"
@@ -119,12 +123,12 @@ pipeline {
                     cd scripts
                     echo "=== Deploying to Development ==="
 
-                    sudo mkdir -p /opt/ec2-scripts/dev
-                    sudo cp *.sh /opt/ec2-scripts/dev/
-                    sudo chmod +x /opt/ec2-scripts/dev/*.sh
+                    mkdir -p /var/lib/jenkins/deployed-scripts/dev
+                    cp *.sh /var/lib/jenkins/deployed-scripts/dev/
+                    chmod +x /var/lib/jenkins/deployed-scripts/dev/*.sh
 
                     echo "Development deployment completed"
-                    ls -la /opt/ec2-scripts/dev/
+                    ls -la /var/lib/jenkins/deployed-scripts/dev/
                 '''
             }
         }
@@ -139,12 +143,12 @@ pipeline {
                     cd scripts
                     echo "=== Deploying to Staging ==="
 
-                    sudo mkdir -p /opt/ec2-scripts/staging
-                    sudo cp *.sh /opt/ec2-scripts/staging/
-                    sudo chmod +x /opt/ec2-scripts/staging/*.sh
+                    mkdir -p /var/lib/jenkins/deployed-scripts/staging
+                    cp *.sh /var/lib/jenkins/deployed-scripts/staging/
+                    chmod +x /var/lib/jenkins/deployed-scripts/staging/*.sh
 
                     echo "Staging deployment completed"
-                    ls -la /opt/ec2-scripts/staging/
+                    ls -la /var/lib/jenkins/deployed-scripts/staging/
                 '''
             }
         }
@@ -159,12 +163,12 @@ pipeline {
                     cd scripts
                     echo "=== Deploying to Production ==="
 
-                    sudo mkdir -p /opt/ec2-scripts/prod
-                    sudo cp *.sh /opt/ec2-scripts/prod/
-                    sudo chmod +x /opt/ec2-scripts/prod/*.sh
+                    mkdir -p /var/lib/jenkins/deployed-scripts/prod
+                    cp *.sh /var/lib/jenkins/deployed-scripts/prod/
+                    chmod +x /var/lib/jenkins/deployed-scripts/prod/*.sh
 
                     echo "Production deployment completed"
-                    ls -la /opt/ec2-scripts/prod/
+                    ls -la /var/lib/jenkins/deployed-scripts/prod/
                 '''
             }
         }
@@ -172,7 +176,7 @@ pipeline {
 
     post {
         always {
-            echo "Pipeline completed for branch: ${env.BRANCH_NAME}"
+            echo "Pipeline completed for branch: ${env.CURRENT_BRANCH}"
             archiveArtifacts artifacts: 'scripts/*.sh', allowEmptyArchive: true
         }
 
