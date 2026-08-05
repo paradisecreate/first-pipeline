@@ -17,6 +17,7 @@ pipeline {
         stage('Script Validation') {
             steps {
                 sh '''
+                    cd scripts
                     echo "=== Script Validation ==="
 
                     for script in *.sh; do
@@ -32,6 +33,7 @@ pipeline {
         stage('Test Scripts') {
             steps {
                 sh '''
+                    cd scripts
                     echo "=== Testing Scripts ==="
                     chmod +x *.sh
 
@@ -55,6 +57,7 @@ pipeline {
 
             steps {
                 sh '''
+                    cd scripts
                     echo "=== Deploying Scripts ==="
 
                     mkdir -p /var/lib/jenkins/deployed-scripts
@@ -69,17 +72,4 @@ pipeline {
     }
 
     post {
-        always {
-            echo 'Pipeline completed'
-            archiveArtifacts artifacts: '*.sh', allowEmptyArchive: true
-        }
-
-        success {
-            echo 'Pipeline succeeded!'
-        }
-
-        failure {
-            echo 'Pipeline failed!'
-        }
-    }
-}
+        always
