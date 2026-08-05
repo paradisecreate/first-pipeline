@@ -72,4 +72,17 @@ pipeline {
     }
 
     post {
-        always
+        always {
+            echo 'Pipeline completed'
+            archiveArtifacts artifacts: 'scripts/*.sh', allowEmptyArchive: true
+        }
+
+        success {
+            echo 'Pipeline succeeded!'
+        }
+
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
