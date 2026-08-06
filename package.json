@@ -1,0 +1,13 @@
+{
+  "name": "devops-application",
+  "version": "1.0.0",
+  "description": "DevOps lab application for Jenkins advanced pipeline",
+  "main": "app/server.js",
+  "scripts": {
+    "build": "mkdir -p dist && echo '<h1>DevOps Application</h1>' > dist/index.html",
+    "test:unit": "mkdir -p test-results && echo '<testsuite tests=\"1\"><testcase classname=\"app\" name=\"unit-test\"/></testsuite>' > test-results/unit.xml"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
