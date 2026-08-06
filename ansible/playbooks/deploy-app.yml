@@ -1,0 +1,30 @@
+---
+- name: Deploy DevOps app locally
+  hosts: local
+  gather_facts: true
+
+  vars:
+    app_name: devops-application
+    deploy_dir: /var/lib/jenkins/ansible-deployments/devops-application
+
+  tasks:
+    - name: Create deployment directory
+      file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy scripts directory
+      copy:
+        src: ../../scripts/
+        dest: "{{ deploy_dir }}/scripts/"
+        mode: "0755"
+
+    - name: Write deployment metadata
+      copy:
+        dest: "{{ deploy_dir }}/deployment-info.txt"
+        content: |
+          Application: {{ app_name }}
+          Environment: {{ app_environment }}
+          Version: {{ app_version }}
+          Deployed by: Jenkins + Ansible
