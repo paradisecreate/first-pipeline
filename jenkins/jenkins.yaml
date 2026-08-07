@@ -3,64 +3,8 @@ jenkins:
 
   numExecutors: 2
 
-  securityRealm:
-    local:
-      allowsSignup: false
-      users:
-        - id: "devops"
-          password: "devops123"
+  mode: NORMAL
 
-  authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
-
-credentials:
-  system:
-    domainCredentials:
-      - credentials:
-          - usernamePassword:
-              scope: GLOBAL
-              id: "dockerhub-credentials"
-              username: "your-dockerhub-username"
-              password: "your-dockerhub-token"
-              description: "Docker Hub credentials"
-
-          - string:
-              scope: GLOBAL
-              id: "api-token"
-              secret: "replace-me"
-              description: "Example API Token"
-
-jobs:
-  - script: >
-      pipelineJob('jcasc-ec2-info-pipeline') {
-        definition {
-          cpsScm {
-            scm {
-              git {
-                remote {
-                  url('https://github.com/paradisecreate/first-pipeline.git')
-                }
-                branches('*/main')
-              }
-            }
-            scriptPath('jenkins/ec2-info.Jenkinsfile')
-          }
-        }
-      }
-
-      pipelineJob('jcasc-ansible-deploy-pipeline') {
-        definition {
-          cpsScm {
-            scm {
-              git {
-                remote {
-                  url('https://github.com/paradisecreate/first-pipeline.git')
-                }
-                branches('*/main')
-              }
-            }
-            scriptPath('jenkins/ansible-deploy.Jenkinsfile')
-          }
-        }
-      }
+unclassified:
+  location:
+    url: "http://localhost:8080/"
